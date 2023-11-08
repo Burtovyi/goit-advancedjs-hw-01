@@ -6,27 +6,11 @@ const player = new Player(iframe);
 
 const keyLS = 'videoplayer-current-time';
 
-player.on('play', function (currentTime) {
-  console.log('played the video!');
-  console.log('time', currentTime.seconds);
-});
-
-player
-  .setCurrentTime(localStorage.getItem(keyLS))
-  .then(function (seconds) {})
-  .catch(function (error) {
-    switch (error.name) {
-      case 'RangeError':
-        break;
-      default:
-        break;
-    }
-  });
+player.setCurrentTime(localStorage.getItem(keyLS) ?? 0);
 
 player.on(
   'timeupdate',
   throttle(currentTime => {
-    console.log(currentTime.seconds);
     localStorage.setItem(keyLS, currentTime.seconds);
   }, 1000)
 );
