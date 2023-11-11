@@ -1,47 +1,44 @@
 import throttle from 'lodash.throttle';
 
+const form = document.querySelector('.feedback-form');
 const inputEmail = document.querySelector('input');
 const textareaMessage = document.querySelector('textarea');
-const btn = document.querySelector('button');
-const form = document.querySelector('.feedback-form');
 
 const key_LS = 'feedback-form-state';
 
-const dataLSInput = JSON.parse(localStorage.getItem(key_LS)) ?? {};
+let dataLSInput = JSON.parse(localStorage.getItem(key_LS)) ?? {};
+
+inputEmail.value = dataLSInput.email ?? '';
+textareaMessage.textContent = dataLSInput.message ?? '';
 
 function addInputLS() {
   localStorage.setItem(key_LS, JSON.stringify(dataLSInput));
 }
 
-const throttledUpdateEmail = throttle(email => {
-  dataLSInput.email = email;
-  addInputLS();
-}, 500);
-
-const throttledUpdateMessage = throttle(message => {
-  dataLSInput.message = message;
-  addInputLS();
-}, 500);
-
-inputEmail.addEventListener('input', event => {
-  throttledUpdateEmail(event.currentTarget.value);
-});
-
-textareaMessage.addEventListener('input', event => {
-  throttledUpdateMessage(event.currentTarget.value);
-});
-
-btn.addEventListener('click', evt => {
+function submit(evt) {
   evt.preventDefault();
   if (dataLSInput.email && dataLSInput.message) {
-    form.reset();
-
-    if (localStorage.getItem(key_LS)) {
-      console.log(localStorage.getItem(key_LS));
-    }
-
+    console.log(dataLSInput);
     localStorage.removeItem(key_LS);
-    throttledUpdateMessage();
-    throttledUpdateEmail();
+
+    form.reset();
+    textareaMessage.textContent = '';
+    return;
+  } else {
+    alert(
+      'Заповніть усі поля форми, а то мене ментор прибʼє, якщо я 3-й раз неправильно ДЗ відправлю ;-)'
+    );
   }
-});
+}
+
+form.addEventListener(
+  'input',
+  throttle(() => {
+    const emailValue = form.email.value;
+    const messageValue = form.message.value;
+    dataLSInput.email = emailValue;
+    dataLSInput.message = messageValue;
+    addInputLS();
+  }, 500)
+);
+form.addEventListener('submit', submit);
